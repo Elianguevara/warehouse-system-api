@@ -26,13 +26,13 @@ public class ProductRequestDto {
     private Integer minStock;
     
     @NotBlank
-    private String category;
-    
-    @NotBlank
     private String barcode;
 
     @NotNull
     private ProductType productType;
     
     private Integer supplierId;
+    
+    @NotNull
+    private Integer categoryId;
 }

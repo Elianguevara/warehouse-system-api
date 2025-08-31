@@ -2,6 +2,7 @@ package com.eguevara.warehouse.warehouse_system.service.impl;
 
 import com.eguevara.warehouse.warehouse_system.dto.ProductRequestDto;
 import com.eguevara.warehouse.warehouse_system.dto.ProductResponseDto;
+import com.eguevara.warehouse.warehouse_system.model.Category;
 import com.eguevara.warehouse.warehouse_system.model.Product;
 import com.eguevara.warehouse.warehouse_system.model.Supplier;
 import com.eguevara.warehouse.warehouse_system.repository.ProductRepository;
@@ -31,6 +32,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private SupplierServiceImpl supplierService;
+    
+    @Autowired
+    private CategoryServiceImpl categoryService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -98,6 +102,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDto saveDto(ProductRequestDto productRequestDto) {
         Product product = modelMapper.map(productRequestDto, Product.class);
+        
+        // Associates the category if an ID is provided
+        if (productRequestDto.getCategoryId() != null) {
+            Category category = categoryService.findById(productRequestDto.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + productRequestDto.getCategoryId()));
+            product.setCategory(category);
+        }
 
         // Associates the supplier if an ID is provided
         if (productRequestDto.getSupplierId() != null) {
@@ -105,7 +116,7 @@ public class ProductServiceImpl implements ProductService {
                     .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: " + productRequestDto.getSupplierId()));
             product.setSupplier(supplier);
         }
-
+        
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponseDto.class);
     }
@@ -118,10 +129,16 @@ public class ProductServiceImpl implements ProductService {
             product.setPrice(productDetailsDto.getPrice());
             product.setStock(productDetailsDto.getStock());
             product.setMinStock(productDetailsDto.getMinStock());
-            product.setCategory(productDetailsDto.getCategory());
             product.setBarcode(productDetailsDto.getBarcode());
-            product.setProductType(productDetailsDto.getProductType()); // **NEW LINE**
+            product.setProductType(productDetailsDto.getProductType());
 
+            // Associates the category if an ID is provided
+            if (productDetailsDto.getCategoryId() != null) {
+                Category category = categoryService.findById(productDetailsDto.getCategoryId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + productDetailsDto.getCategoryId()));
+                product.setCategory(category);
+            }
+            
             // Associates the supplier if an ID is provided
             if (productDetailsDto.getSupplierId() != null) {
                 Supplier supplier = supplierService.findById(productDetailsDto.getSupplierId())

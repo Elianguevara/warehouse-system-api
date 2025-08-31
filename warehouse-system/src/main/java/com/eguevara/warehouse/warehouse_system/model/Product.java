@@ -28,11 +28,15 @@ public class Product {
     private BigDecimal price;
     private Integer stock;
     private Integer minStock;
-    private String category;
     private String barcode;
-    
+
     @Enumerated(EnumType.STRING)
     private ProductType productType;
+
+    // Many-to-one relationship with Category (a product has one category)
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     // Many-to-one relationship with Supplier (a product has one supplier)
     @ManyToOne

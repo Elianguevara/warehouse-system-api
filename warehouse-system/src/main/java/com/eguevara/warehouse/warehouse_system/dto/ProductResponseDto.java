@@ -12,8 +12,8 @@ public class ProductResponseDto {
     private BigDecimal price;
     private Integer stock;
     private Integer minStock;
-    private String category;
     private String barcode;
     private Integer supplierId;
     private ProductType productType;
+    private Integer categoryId;
 }
