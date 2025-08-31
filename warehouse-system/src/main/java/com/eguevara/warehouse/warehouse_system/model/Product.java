@@ -7,10 +7,10 @@ import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 
 /**
- * Representa la tabla 'Product' en la base de datos.
- * Es la entidad principal que almacena los detalles de cada artículo que se vende o almacena.
- * Incluye el campo 'barcode' para la búsqueda por lector de códigos de barras.
- * El campo 'minStock' es esencial para las alertas de reabastecimiento.
+ * Represents the 'Product' table in the database.
+ * This is the main entity that stores the details of each item sold or stored.
+ * Includes the 'barcode' field for barcode reader lookup.
+ * The 'minStock' field is essential for replenishment alerts.
  */
 @Entity
 @Table(name = "Product")
@@ -30,8 +30,11 @@ public class Product {
     private Integer minStock;
     private String category;
     private String barcode;
+    
+    @Enumerated(EnumType.STRING)
+    private ProductType productType;
 
-    // Relación de muchos a uno con Supplier (un producto tiene un proveedor)
+    // Many-to-one relationship with Supplier (a product has one supplier)
     @ManyToOne
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;

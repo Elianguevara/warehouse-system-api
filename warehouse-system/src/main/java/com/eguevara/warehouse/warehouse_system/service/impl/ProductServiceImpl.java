@@ -19,14 +19,14 @@ import java.util.stream.Collectors;
 
 
 /**
- * Implementación del servicio para la entidad Product.
- * Contiene la lógica de negocio para las operaciones con productos,
- * como buscar, guardar, actualizar y eliminar.
+ * Implementation of the service for the Product entity.
+ * Contains the business logic for product operations,
+ * such as finding, saving, updating, and deleting.
  */
-@Service // Indica a Spring que esta clase es un bean de servicio.
+@Service // Indicates to Spring that this class is a service bean.
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired // Inyecta el repositorio para el acceso a la base de datos.
+    @Autowired // Injects the repository for database access.
     private ProductRepository productRepository;
 
     @Autowired
@@ -36,15 +36,15 @@ public class ProductServiceImpl implements ProductService {
     private ModelMapper modelMapper;
 
     /**
-     * Devuelve una lista de todos los productos en la base de datos.
-     * @return Una lista de objetos Product.
+     * Returns a list of all products in the database.
+     * @return A list of Product objects.
      */
     @Override
     public List<Product> findAll() {
         return productRepository.findAll();
     }
 
-    // Nuevo método paginado
+    // New paginated method
     @Override
     public Page<ProductResponseDto> findAllDto(Pageable pageable) {
         return productRepository.findAll(pageable)
@@ -52,9 +52,9 @@ public class ProductServiceImpl implements ProductService {
     }
     
     /**
-     * Busca un producto por su ID.
-     * @param id El ID del producto.
-     * @return Un Optional que puede contener el objeto Product si se encuentra.
+     * Finds a product by its ID.
+     * @param id The product's ID.
+     * @return An Optional that may contain the Product object if found.
      */
     @Override
     public Optional<Product> findById(Integer id) {
@@ -68,10 +68,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * Busca un producto por su código de barras.
-     * Es crucial para la funcionalidad del lector de códigos de barras.
-     * @param barcode El código de barras del producto.
-     * @return El objeto Product encontrado o null si no existe.
+     * Finds a product by its barcode.
+     * It is crucial for the barcode reader functionality.
+     * @param barcode The product's barcode.
+     * @return The found Product object or null if it doesn't exist.
      */
     @Override
     public Product findByBarcode(String barcode) {
@@ -86,9 +86,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * Guarda o actualiza un producto en la base de datos.
-     * @param product El objeto Product a guardar.
-     * @return El objeto Product guardado con el ID asignado.
+     * Saves or updates a product in the database.
+     * @param product The Product object to save.
+     * @return The saved Product object with the assigned ID.
      */
     @Override
     public Product save(Product product) {
@@ -99,10 +99,10 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDto saveDto(ProductRequestDto productRequestDto) {
         Product product = modelMapper.map(productRequestDto, Product.class);
 
-        // Asocia el proveedor si se proporciona un ID
+        // Associates the supplier if an ID is provided
         if (productRequestDto.getSupplierId() != null) {
             Supplier supplier = supplierService.findById(productRequestDto.getSupplierId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Proveedor no encontrado con el ID: " + productRequestDto.getSupplierId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: " + productRequestDto.getSupplierId()));
             product.setSupplier(supplier);
         }
 
@@ -120,11 +120,12 @@ public class ProductServiceImpl implements ProductService {
             product.setMinStock(productDetailsDto.getMinStock());
             product.setCategory(productDetailsDto.getCategory());
             product.setBarcode(productDetailsDto.getBarcode());
+            product.setProductType(productDetailsDto.getProductType()); // **NEW LINE**
 
-            // Asocia el proveedor si se proporciona un ID
+            // Associates the supplier if an ID is provided
             if (productDetailsDto.getSupplierId() != null) {
                 Supplier supplier = supplierService.findById(productDetailsDto.getSupplierId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Proveedor no encontrado con el ID: " + productDetailsDto.getSupplierId()));
+                        .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: " + productDetailsDto.getSupplierId()));
                 product.setSupplier(supplier);
             }
 
@@ -134,8 +135,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * Elimina un producto de la base de datos por su ID.
-     * @param id El ID del producto a eliminar.
+     * Deletes a product from the database by its ID.
+     * @param id The ID of the product to delete.
      */
     @Override
     public void deleteById(Integer id) {

@@ -1,5 +1,6 @@
 package com.eguevara.warehouse.warehouse_system.dto;
 
+import com.eguevara.warehouse.warehouse_system.model.ProductType;
 import lombok.Data;
 import java.math.BigDecimal;
 
@@ -14,4 +15,5 @@ public class ProductResponseDto {
     private String category;
     private String barcode;
     private Integer supplierId;
+    private ProductType productType;
 }

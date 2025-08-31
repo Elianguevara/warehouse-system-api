@@ -3,6 +3,7 @@ package com.eguevara.warehouse.warehouse_system.service.impl;
 import com.eguevara.warehouse.warehouse_system.dto.ProductLotRequestDto;
 import com.eguevara.warehouse.warehouse_system.dto.ProductLotResponseDto;
 import com.eguevara.warehouse.warehouse_system.model.Product;
+import com.eguevara.warehouse.warehouse_system.model.ProductType;
 import com.eguevara.warehouse.warehouse_system.model.ProductLot;
 import com.eguevara.warehouse.warehouse_system.repository.ProductLotRepository;
 import com.eguevara.warehouse.warehouse_system.service.ProductLotService;
@@ -33,7 +34,7 @@ public class ProductLotServiceImpl implements ProductLotService {
         return productLotRepository.findAll();
     }
 
-    // Implementación del método de paginación
+    // Paginating method implementation
     @Override
     public Page<ProductLotResponseDto> findAllDto(Pageable pageable) {
         return productLotRepository.findAll(pageable)
@@ -60,10 +61,16 @@ public class ProductLotServiceImpl implements ProductLotService {
     public ProductLotResponseDto saveDto(ProductLotRequestDto productLotRequestDto) {
         ProductLot productLot = modelMapper.map(productLotRequestDto, ProductLot.class);
 
-        // Asocia el producto si se proporciona un ID
+        // Associates the product if an ID is provided
         if (productLotRequestDto.getProductId() != null) {
             Product product = productService.findById(productLotRequestDto.getProductId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con el ID: " + productLotRequestDto.getProductId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productLotRequestDto.getProductId()));
+            
+            // **NEW VALIDATION**: Checks if the product is PERISHABLE
+            if (product.getProductType() != ProductType.PERISHABLE) {
+                throw new IllegalArgumentException("Cannot create a lot for a non-perishable product.");
+            }
+            
             productLot.setProduct(product);
         }
 
